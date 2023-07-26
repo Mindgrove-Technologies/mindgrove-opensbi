@@ -21,19 +21,20 @@
 #define UART_TX_FULL  0x2
 #define UART_RX_NOT_EMPTY 0x4
 #define UART_RX_FULL  0x8
+#define UART_RX_NOT_EMPTY 0x4
 
 static volatile char *uart_base;
 
 static void shakti_uart_putc(char ch)
 {
-	while ((readb(uart_base + REG_STATUS) & UART_TX_FULL))
+	while ((readw(uart_base + REG_STATUS) & UART_TX_FULL))
 		;
 	writeb(ch, uart_base + REG_TX);
 }
 
 static int shakti_uart_getc(void)
 {
-	if (readb(uart_base + REG_STATUS) & UART_RX_NOT_EMPTY)
+	if (readw(uart_base + REG_STATUS) & UART_RX_NOT_EMPTY)
 		return readb(uart_base + REG_RX);
 	return -1;
 }

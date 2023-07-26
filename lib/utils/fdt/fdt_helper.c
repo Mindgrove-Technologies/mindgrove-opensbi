@@ -30,7 +30,7 @@
 #define DEFAULT_SIFIVE_UART_FREQ		0
 #define DEFAULT_SIFIVE_UART_BAUD		115200
 
-#define DEFAULT_SHAKTI_UART_FREQ		50000000
+#define DEFAULT_SHAKTI_UART_FREQ		100000000
 #define DEFAULT_SHAKTI_UART_BAUD		115200
 
 const struct fdt_match *fdt_match_node(void *fdt, int nodeoff,
