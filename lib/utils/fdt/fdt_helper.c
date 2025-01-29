@@ -33,6 +33,9 @@
 #define DEFAULT_SHAKTI_UART_FREQ		100000000
 #define DEFAULT_SHAKTI_UART_BAUD		115200
 
+#define DEFAULT_SECURE_IOT_UART_FREQ	700000000
+#define DEFAULT_SECURE_IOT_UART_BAUD	115200
+
 const struct fdt_match *fdt_match_node(const void *fdt, int nodeoff,
 				       const struct fdt_match *match_table)
 {
@@ -561,6 +564,14 @@ int fdt_parse_shakti_uart_node(const void *fdt, int nodeoffset,
 	return fdt_parse_uart_node_common(fdt, nodeoffset, uart,
 					DEFAULT_SHAKTI_UART_FREQ,
 					DEFAULT_SHAKTI_UART_BAUD);
+}
+
+int fdt_parse_mindgrove_uart_node(const void *fdt, int nodeoffset,
+			       struct platform_uart_data *uart)
+{
+	return fdt_parse_uart_node_common(fdt, nodeoffset, uart,
+					DEFAULT_SECURE_IOT_UART_FREQ,
+					DEFAULT_SECURE_IOT_UART_BAUD);
 }
 
 int fdt_parse_sifive_uart_node(const void *fdt, int nodeoffset,
