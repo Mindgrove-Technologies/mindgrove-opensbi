@@ -17,21 +17,18 @@
 #include <sbi/sbi_string.h>
 #include <sbi/sbi_system.h>
 #include <sbi/sbi_tlb.h>
-#include <sbi_utils/mpxy/fdt_mpxy.h>
-#include <sbi_utils/cppc/fdt_cppc.h>
 #include <sbi_utils/fdt/fdt_domain.h>
+#include <sbi_utils/fdt/fdt_driver.h>
 #include <sbi_utils/fdt/fdt_fixup.h>
 #include <sbi_utils/fdt/fdt_helper.h>
 #include <sbi_utils/fdt/fdt_pmu.h>
-#include <sbi_utils/hsm/fdt_hsm.h>
+#include <sbi_utils/ipi/fdt_ipi.h>
 #include <sbi_utils/irqchip/fdt_irqchip.h>
 #include <sbi_utils/irqchip/imsic.h>
+#include <sbi_utils/mpxy/fdt_mpxy.h>
 #include <sbi_utils/serial/fdt_serial.h>
-#include <sbi_utils/suspend/fdt_suspend.h>
-#include <sbi_utils/timer/fdt_timer.h>
-#include <sbi_utils/ipi/fdt_ipi.h>
-#include <sbi_utils/reset/fdt_reset.h>
 #include <sbi_utils/serial/semihosting.h>
+#include <sbi_utils/timer/fdt_timer.h>
 
 /* List of platform override modules generated at compile time */
 extern const struct platform_override *const platform_override_modules[];
@@ -200,8 +197,8 @@ unsigned long fw_platform_init(unsigned long arg0, unsigned long arg1,
 		if (rc)
 			continue;
 
-		if (SBI_HARTMASK_MAX_BITS <= hartid)
-			continue;
+		if (SBI_HARTMASK_MAX_BITS <= hart_count)
+			break;
 
 		if (!fdt_node_is_enabled(fdt, cpu_offset))
 			continue;
@@ -257,10 +254,7 @@ static int generic_early_init(bool cold_boot)
 		if (rc)
 			return rc;
 
-		fdt_cppc_init(fdt);
-		fdt_hsm_init(fdt);
-		fdt_reset_init(fdt);
-		fdt_suspend_init(fdt);
+		fdt_driver_init_all(fdt, fdt_early_drivers);
 	}
 
 	if (!generic_plat || !generic_plat->early_init)

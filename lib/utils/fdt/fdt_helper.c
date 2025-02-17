@@ -55,29 +55,6 @@ const struct fdt_match *fdt_match_node(const void *fdt, int nodeoff,
 	return NULL;
 }
 
-int fdt_find_match(const void *fdt, int startoff,
-		   const struct fdt_match *match_table,
-		   const struct fdt_match **out_match)
-{
-	int nodeoff;
-
-	if (!fdt || !match_table)
-		return SBI_ENODEV;
-
-	while (match_table->compatible) {
-		nodeoff = fdt_node_offset_by_compatible(fdt, startoff,
-						match_table->compatible);
-		if (nodeoff >= 0) {
-			if (out_match)
-				*out_match = match_table;
-			return nodeoff;
-		}
-		match_table++;
-	}
-
-	return SBI_ENODEV;
-}
-
 int fdt_parse_phandle_with_args(const void *fdt, int nodeoff,
 				const char *prop, const char *cells_prop,
 				int index, struct fdt_phandle_args *out_args)
@@ -641,14 +618,13 @@ int fdt_parse_aplic_node(const void *fdt, int nodeoff, struct aplic_data *aplic)
 	bool child_found;
 	const fdt32_t *val;
 	const fdt32_t *del;
-	struct imsic_data imsic;
+	struct imsic_data imsic = { 0 };
 	int i, j, d, dcnt, len, noff, rc;
 	uint64_t reg_addr, reg_size;
 	struct aplic_delegate_data *deleg;
 
 	if (nodeoff < 0 || !aplic || !fdt)
 		return SBI_ENODEV;
-	memset(aplic, 0, sizeof(*aplic));
 
 	rc = fdt_get_node_addr_size(fdt, nodeoff, 0, &reg_addr, &reg_size);
 	if (rc < 0 || !reg_addr || !reg_size)
@@ -1043,7 +1019,7 @@ int fdt_parse_aclint_node(const void *fdt, int nodeoffset,
 		if (rc)
 			continue;
 
-		if (SBI_HARTMASK_MAX_BITS <= hartid)
+		if (SBI_HARTMASK_MAX_BITS <= sbi_hartid_to_hartindex(hartid))
 			continue;
 
 		if (match_hwirq == hwirq) {
@@ -1108,7 +1084,7 @@ int fdt_parse_plmt_node(const void *fdt, int nodeoffset, unsigned long *plmt_bas
 		if (rc)
 			continue;
 
-		if (SBI_HARTMASK_MAX_BITS <= hartid)
+		if (SBI_HARTMASK_MAX_BITS <= sbi_hartid_to_hartindex(hartid))
 			continue;
 
 		if (hwirq == IRQ_M_TIMER)
@@ -1164,7 +1140,7 @@ int fdt_parse_plicsw_node(const void *fdt, int nodeoffset, unsigned long *plicsw
 		if (rc)
 			continue;
 
-		if (SBI_HARTMASK_MAX_BITS <= hartid)
+		if (SBI_HARTMASK_MAX_BITS <= sbi_hartid_to_hartindex(hartid))
 			continue;
 
 		if (hwirq == IRQ_M_SOFT)
