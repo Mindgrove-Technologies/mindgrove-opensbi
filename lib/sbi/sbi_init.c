@@ -318,13 +318,13 @@ static void __noreturn init_coldboot(struct sbi_scratch *scratch, u32 hartid)
 		sbi_printf("%s: mpxy init failed (error %d)\n", __func__, rc);
 		sbi_hart_hang();
 	}
+
 	/*
-	 * Note: Finalize domains after HSM initialization so that we
-	 * can startup non-root domains.
+	 * Note: Finalize domains after HSM initialization
 	 * Note: Finalize domains before HART PMP configuration so
 	 * that we use correct domain for configuring PMP.
 	 */
-	rc = sbi_domain_finalize(scratch, hartid);
+	rc = sbi_domain_finalize(scratch);
 	if (rc) {
 		sbi_printf("%s: domain finalize failed (error %d)\n",
 			   __func__, rc);
@@ -371,6 +371,17 @@ static void __noreturn init_coldboot(struct sbi_scratch *scratch, u32 hartid)
 	sbi_boot_print_hart(scratch, hartid);
 
 	run_all_tests();
+
+	/*
+	 * Note: Startup domains after all initialization are done
+	 * otherwise boot HART of non-root domain can crash.
+	 */
+	rc = sbi_domain_startup(scratch, hartid);
+	if (rc) {
+		sbi_printf("%s: domain startup failed (error %d)\n",
+			   __func__, rc);
+		sbi_hart_hang();
+	}
 
 	/*
 	 * Configure PMP at last because if SMEPMP is detected,
@@ -566,6 +577,19 @@ void __noreturn sbi_init(struct sbi_scratch *scratch)
 		init_coldboot(scratch, hartid);
 	else
 		init_warmboot(scratch, hartid);
+}
+
+void sbi_revert_entry_count(struct sbi_scratch *scratch)
+{
+	unsigned long *entry_count, *init_count;
+
+	if (!entry_count_offset || !init_count_offset)
+		sbi_hart_hang();
+
+	entry_count = sbi_scratch_offset_ptr(scratch, entry_count_offset);
+	init_count = sbi_scratch_offset_ptr(scratch, init_count_offset);
+
+	*entry_count = *init_count;
 }
 
 unsigned long sbi_entry_count(u32 hartindex)

@@ -330,7 +330,7 @@ skip_suspend_states:
 
 	/* Register HSM fixup callback */
 	rc = fdt_register_general_fixup(&rpmi_hsm_fixup);
-	if (rc)
+	if (rc && rc != SBI_EALREADY)
 		goto fail_free_susp_state_names;
 
 	/* Register HSM device */
@@ -356,8 +356,7 @@ static const struct fdt_match rpmi_hsm_match[] = {
 	{},
 };
 
-struct fdt_driver fdt_hsm_rpmi = {
+const struct fdt_driver fdt_hsm_rpmi = {
 	.match_table = rpmi_hsm_match,
 	.init = rpmi_hsm_cold_init,
-	.experimental = true,
 };
