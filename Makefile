@@ -704,6 +704,14 @@ install_firmwares: $(platform_build_dir)/lib/libplatsbi.a $(build_dir)/lib/libsb
 install_docs: $(build_dir)/docs/latex/refman.pdf
 	$(call inst_file,$(install_root_dir)/$(install_docs_path)/refman.pdf,$(build_dir)/docs/latex/refman.pdf)
 
+.PHONY: hexdump
+hexdump:
+	@riscv64-unknown-linux-gnu-objdump -D -S $(platform_build_dir)/firmware/fw_payload.elf >> $(platform_build_dir)/firmware/fw_payload.dump
+	@riscv64-unknown-linux-gnu-objdump -D -S $(platform_build_dir)/firmware/fw_dynamic.elf >> $(platform_build_dir)/firmware/fw_dynamic.dump
+	@riscv64-unknown-linux-gnu-objdump -D -S $(platform_build_dir)/firmware/fw_jump.elf >> $(platform_build_dir)/firmware/fw_jump.dump
+	@riscv64-unknown-elf-elf2hex --bit-width 64 --input $(platform_build_dir)/firmware/fw_payload.elf --output $(platform_build_dir)/firmware/fw_payload.mem
+	@python3 line_extend.py -i $(platform_build_dir)/firmware/fw_payload.mem -o $(platform_build_dir)/firmware/code.mem -n 4194304
+
 .PHONY: cscope
 cscope:
 	$(CMD_PREFIX)find \
