@@ -1,0 +1,1 @@
+make distclean && make CROSS_COMPILE=riscv64-unknown-linux-gnu- PLATFORM=generic FW_FDT_PATH=../mindgrove-u-boot/arch/riscv/dts/mindgrove-v26xx.dtb FW_PAYLOAD=y FW_PAYLOAD_PATH=../mindgrove-u-boot/u-boot.bin FW_TEXT_START=0x80000000 FW_PAYLOAD_OFFSET=0x200000 -j$(nproc) && make hexdump PLATFORM=generic && cp build/platform/generic/firmware/code.mem ../MULTI_CORE_LLC_V1.8/bin/.
