@@ -10,8 +10,8 @@
 #include <sbi_utils/serial/mindgrove-uart.h>
 
 #define MINDGROVE_UART_BASE   0x00011300UL 
-#define SECURE_IOT_UART_FREQ  700000000 
-#define SECURE_IOT_UART_BAUD  115200 
+#define SECURE_IOT_UART_FREQ  100000000 
+#define SECURE_IOT_UART_BAUD  1250000
 
 static int serial_mindgrove_init(const void *fdt, int nodeoff,
 			      const struct fdt_match *match)
