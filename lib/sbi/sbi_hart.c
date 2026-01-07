@@ -1140,6 +1140,17 @@ sbi_hart_switch_mode(unsigned long arg0, unsigned long arg1,
 		}
 	}
 
+	//FIX: *TO BE INCLUDED FOR PMP SUPPORT*
+
+//   uintptr_t pmpc = PMP_A_NAPOT | PMP_R | PMP_W | PMP_X;
+//   asm volatile ("la t0, 1f\n\t"
+//                 "csrrw t0, mtvec, t0\n\t"
+//                 "csrw pmpaddr0, %1\n\t"
+//                 "csrw pmpcfg0, %0\n\t"
+//                 ".align 2\n\t"
+//                 "1: csrw mtvec, t0\n\t"
+//                 : : "r" (pmpc), "r" (-1UL) : "t0");
+
 	register unsigned long a0 asm("a0") = arg0;
 	register unsigned long a1 asm("a1") = arg1;
 	__asm__ __volatile__("mret" : : "r"(a0), "r"(a1));
